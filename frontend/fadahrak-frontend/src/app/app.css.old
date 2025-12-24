@@ -1,0 +1,107 @@
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useEffect, useState } from 'react';
+
+import Navbar from './components/Navbar.jsx';
+import Footer from './components/Footer.jsx';
+import LanguageSwitcher from './components/LanguageSwitcher.jsx';
+
+import Home from './components/Home.jsx';
+import About from './components/About.jsx';
+import Contact from './components/Contact.jsx';
+import FAQ from './components/FAQ.jsx';
+import Terms from './components/Terms.jsx';
+import Privacy from './components/Privacy.jsx';
+import HowItWorks from './components/HowItWorks.jsx';
+import SuccessStories from './components/SuccessStories.jsx';
+
+import Signup from './components/Signup.jsx';
+import Login from './components/Login.jsx';
+import OwnerDashboard from './components/OwnerDashboard.jsx';
+import SeekerDashboard from './components/SeekerDashboard.jsx';
+import JobDetails from './components/JobDetails.jsx';
+import ProfileEdit from './components/ProfileEdit.jsx';
+
+export default function App() {
+  const { i18n } = useTranslation();
+  const [user, setUser] = useState(null);
+
+  // استرجاع الـ user من localStorage عند تحميل الصفحة
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        localStorage.removeItem('user');
+      }
+    }
+  }, []);
+
+  // تحديث اتجاه الصفحة (RTL/LTR) بناءً على اللغة
+  useEffect(() => {
+    document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
+
+  // Protected Route مع دعم role
+  const ProtectedRoute = ({ children, role }) => {
+    if (!user) {
+      return <Navigate to="/login" replace />;
+    }
+    if (role && user.role !== role) {
+      return <Navigate to="/" replace />;
+    }
+    return children;
+  };
+
+  // دالة لتمريرها لـ Signup و Login عشان يحدثوا الـ user
+  const handleAuthSuccess = (userData) => {
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', userData.token || ''); // لو الـ backend بيرجع token
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <Navbar user={user} setUser={setUser} />
+
+      <div className="fixed top-4 left-4 z-50">
+        <LanguageSwitcher />
+      </div>
+
+      <main className="flex-grow pt-20"> {/* pt-20 عشان الـ LanguageSwitcher والـ Navbar */}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/success-stories" element={<SuccessStories />} />
+
+          <Route path="/signup" element={<Signup onAuthSuccess={handleAuthSuccess} />} />
+          <Route path="/login" element={<Login onAuthSuccess={handleAuthSuccess} />} />
+
+          <Route path="/job/:id" element={<JobDetails />} />
+          <Route path="/profile" element={<ProtectedRoute><ProfileEdit user={user} /></ProtectedRoute>} />
+
+          <Route
+            path="/owner-dashboard"
+            element={<ProtectedRoute role="shop_owner"><OwnerDashboard user={user} /></ProtectedRoute>}
+          />
+          <Route
+            path="/seeker-dashboard"
+            element={<ProtectedRoute role="job_seeker"><SeekerDashboard user={user} /></ProtectedRoute>}
+          />
+
+          {/* 404 */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

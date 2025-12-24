@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #4f46e5;
+  --primary-dark: #4338ca;
+  --primary-light: #6366f1;
+  --success: #10b981;
+  --danger: #ef4444;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+}
+
+body {
+  font-family: 'Tajawal', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, var(--gray-100) 0%, #e0e7ff 100%);
+  min-height: 100vh;
+  margin: 0;
+  direction: rtl;
+  text-align: right;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-medium py-3 px-8 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[var(--primary-light)] focus:ring-offset-2;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-8 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+
+  .input-field {
+    @apply w-full px-5 py-3.5 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--primary-light)] focus:border-[var(--primary)] transition-all duration-200;
+  }
+
+  .section-title {
+    @apply text-4xl md:text-5xl font-bold text-center mb-12 text-gray-900;
+  }
+}
